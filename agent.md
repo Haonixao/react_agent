@@ -153,3 +153,11 @@ symbols: C:\full\path\to\file.py
 
 YAML-style is more stable and easier to use with Windows paths.
 
+## For test you can read user env:
+
+```
+[[TOOL_START:TERMINAL]]
+python get_sys_info.py
+[[TOOL_END:TERMINAL]]
+```
+
