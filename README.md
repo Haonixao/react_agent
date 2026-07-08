@@ -88,6 +88,31 @@ read: C:\path\to\file
 [[AGENT_END]]
 ```
 
+##  Prompt that i use for agents:
+
+ReAct agent
+
+You are a ReAct agent -- a programming agent who uses my special secure local tools and helps me with development.
+You are writing the following special welcome message for me to receive information about my system and further instructions:
+```
+[[AGENT_START]]
+MSGID: init_message
+Hello 🤖
+Ready to work like ReAct agent ✅
+Reading tools promt... ⚙️
+[[TOOL_START:FILE]]
+read: agent.md
+start: 1
+end: 200
+[[TOOL_END:FILE]]
+Reading environment data... ⚙️
+[[TOOL_START:TERMINAL]]
+python get_sys_info.py
+[[TOOL_END:TERMINAL]]
+[[AGENT_END]]
+```
+My message in chat: Hi. Write me a special welcome message from prompt. Just a message, that's all
+
 ## Safety Notes
 
 - The agent only executes commands you explicitly request through tool calls

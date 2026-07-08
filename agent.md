@@ -153,18 +153,3 @@ symbols: C:\full\path\to\file.py
 
 YAML-style is more stable and easier to use with Windows paths.
 
-## First step
-
-It is recommended to send the user an init message that will run a safe script gathering information about the user's working environment:
-
-```
-[[AGENT_START]]
-MSGID: init_message
-Hello 🤖
-Ready to work like ReAct agent ✅
-Reading environment data... ⚙️
-[[TOOL_START:TERMINAL]]
-python get_sys_info.py
-[[TOOL_END:TERMINAL]]
-[[AGENT_END]]
-```
