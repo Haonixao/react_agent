@@ -154,7 +154,11 @@ async def send_reply(websocket, text, selector):
         subprocess.run(["pwsh", "-NoProfile", "-Command", ps_cmd], capture_output=True)
         time.sleep(0.1)
     except Exception as e:
-        print(f"Clipboard Error: {e}")
+        formatted_text = f"Clipboard Error: {e}\n"
+        b64_text = base64.b64encode(formatted_text.encode('utf-8')).decode('utf-8')
+        ps_cmd = f"$text = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('{b64_text}')); Set-Clipboard -Value $text; $wshell = New-Object -ComObject WScript.Shell; $wshell.SendKeys('^{{V}}');"
+        subprocess.run(["pwsh", "-NoProfile", "-Command", ps_cmd], capture_output=True)
+        time.sleep(0.1)
 
 def execute_command(cmd):
     print(f"  > Executing Terminal: {cmd}")
