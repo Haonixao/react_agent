@@ -253,7 +253,6 @@ def execute_file_tool(content):
             if action == "read":
                 read_counter += 1
 
-        # Находим filetool.py рядом со скриптом
         script_dir = os.path.dirname(os.path.abspath(__file__))
         filetool_path = os.path.join(script_dir, "filetool.py")
 
@@ -265,7 +264,8 @@ def execute_file_tool(content):
         
         stdout, stderr = process.communicate(input=json.dumps(data))
         output = stdout.strip()
-        if stderr: output += "\nError:\n" + stderr
+        if stderr: 
+            output += "\nError:\n" + stderr
         
         print(f"    [+] File Tool Output: {output[:50]}...")
 
