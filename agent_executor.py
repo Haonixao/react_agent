@@ -250,14 +250,14 @@ def execute_file_tool(content):
                         if "action" not in data:
                             data["action"] = "patch"
                     else:
-                        return "Error: incorrect patch format. Separator '|' expected"
+                        return "Error: incorrect patch format for old_text. Correct format:\nold_text:|\nOld line 1\nOld line 2"
                 elif key == "new_text":
                     if val == "|":
                         in_new_text = True
                         if "action" not in data:
                             data["action"] = "patch"
                     else:
-                        return "Error: incorrect patch format. Separator '|' expected"
+                        return "Error: incorrect patch format for new_text. Correct format:\nnew_text:|\nNew line 1\nNew line 2"
             if in_old_text:
                 data["old_text"] = "\n".join(old_text_lines)
             if in_new_text:
@@ -272,7 +272,7 @@ def execute_file_tool(content):
         # === Защита от двойного патча (только для start-end режима) ===
         if action == "patch" and data.get("old_text") is None:
             if path in patched_files:
-                return f"Error: Double patch detected for {path} without read/symbols in between. This can lead to incorrect changes. Do read and then patch again"
+                return f"Error: Double patch with strings range detected for {path} without read/symbols in between. This can lead to incorrect changes. Do read and then patch with strings range again. Or use patch with old_text + new_text (no double patch problem in this case)"
             patched_files[path] = True
         elif action in ["read", "symbols"]:
             if path in patched_files:
@@ -419,7 +419,7 @@ async def main_loop():
                                     cmd = cmd_raw.strip()
                                     cmd = re.sub(r'```[a-zA-Z]*\n?', '', cmd)
                                     cmd = cmd.replace('```', '').strip()
-                                    if not cmd: 
+                                    if not cmd:
                                         continue
                                     output = execute_command(cmd)
                                     final_reply.append(f"[[TOOL_START:TERMINAL]]\nCommand: {cmd}\n{output}\n[[TOOL_END:TERMINAL]]")
