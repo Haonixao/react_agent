@@ -47,7 +47,7 @@ your command
 ### Rules:
 - Every message starts with `[[AGENT_START]]`
 - Immediately after it, on a new line, specify `MSGID: <unique_id>` (use numbers, timestamps, or any unique string)
-- You can call tools (TERMINAL, FILE, etc.) inside the message
+- You can call tools (TERMINAL, FILE, etc.) inside the message. Important to call tools inside code block (```) in message
 - Always close with `[[AGENT_END]]`
 - After sending, you will receive the execution results of your tools in the next user message
 
