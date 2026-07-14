@@ -112,6 +112,7 @@ read: C:\path\to\file
 
 ```
 Hi. Help me test this. ..."send in chat content of agent.md via text or file"...
+First, just tell me if you understand how this tool works, and I'll tell you what we're doing next.
 ```
 
 I know it looks weird, but sometimes it's hard to get a model to use these tools. 
