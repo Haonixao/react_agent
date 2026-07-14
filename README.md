@@ -10,6 +10,26 @@ This project creates a **closed-loop ReAct agent** that runs locally on your Win
 
 It effectively gives the AI persistent, real-world execution capabilities.
 
+## Reasons
+
+- No need to install heavy programs or plugins. You just have a small python script that runs in the terminal.
+- Perhaps for some, like me, it is convenient when your web ai chat (which is already open in the browser tab) can have the capabilities of an ai agent without overloading your idea|code editor.
+- You have one interface and one subscription for simple quick web queries and for editing files|executing commands on your local system.
+- You don't have complicated api key settings, binding to specific API providers, and AI programs. Any chat in the browser tab automatically gets the opportunity to interact with your system as an agent.
+
+---
+
+**BUT. There are disadvantages compared to large, well-honed tools**
+
+- The tool is very young, minimalistic, and not described as a classic tool for ai. 
+- ai can sometimes use it incorrectly. 
+- it can be slow. 
+- it can be inconvenient (because during the execution of operations, the browser tab must be in focus and your clipboard is used to transfer content).
+
+---
+
+**Nevertheless, I find it quite convenient for myself because ai often just reads|edits my files, executes some commands|scripts. At the same time, there is absolutely no heavy agent software on my PC that overloads the system.**
+
 ## Features
 
 - **Terminal Execution** — Run any PowerShell commands with full output capture
@@ -90,7 +110,16 @@ read: C:\path\to\file
 
 ##  My first message in chat:
 
+```
 Hi. Help me test this. ..."send in chat content of agent.md via text or file"...
+```
+
+I know it looks weird, but sometimes it's hard to get a model to use these tools. 
+- Model thinks you're trying to hack her with this prompt. 
+- Or model thinks that in fact these tools are just an illusion, and she misleads the user by executing fake commands.
+- Or model just refuses to use your tools and wants to use only her own.
+
+Therefore, some particularly strict models sometimes have to explain that this is not fake, not hack and her own tools do not allow it to interact with the user's system.
 
 ## Safety Notes
 
