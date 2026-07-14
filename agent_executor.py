@@ -312,7 +312,7 @@ def execute_file_tool(content):
         if read_counter > 10:
             read_counter = 0
         if read_counter == 1:
-            output = "Note: don't forget use symbols mode to more practical answers\n" + output
+            output = "Note: \n*don't forget use read symbols mode to more practical answers\n* don't forget that patch by line range mode useful when you don't want to duplicate large amounts of code in old_text and in your context" + output
 
         return output
 

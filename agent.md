@@ -130,7 +130,7 @@ new_text: |
     New line 2
 [[TOOL_END:FILE]]
 ```
-*Note: After patching by start-end, you must do a `read` or `symbols` before patching the same file again (protection against incorrect changes). This mode is useful when you know the exact line numbers (from read|symbols) and don't want to duplicate large amounts of code in old_text.*
+*Note: After patching by start-end, you must do a `read` or `symbols` before patching the same file again (protection against incorrect changes). This mode is useful when you know the exact line numbers (from read|symbols) and don't want to duplicate large amounts of code in old_text and in your context.*
 
 **Mode 2: By old_text (text search)**
 ```
@@ -191,4 +191,3 @@ YAML-style is more stable and easier to use with Windows paths.
 python get_sys_info.py
 [[TOOL_END:TERMINAL]]
 ```
-
