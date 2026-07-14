@@ -136,15 +136,6 @@ new_text: |
 ```
 [[TOOL_START:FILE]]
 patch: C:\full\path\to\file.py
-old_text: Old line 1
-new_text: New line 1
-replace_all: false
-[[TOOL_END:FILE]]
-```
-Or multi-line:
-```
-[[TOOL_START:FILE]]
-patch: C:\full\path\to\file.py
 old_text: |
     Old line 1
     Old line 2
@@ -154,8 +145,8 @@ new_text: |
 replace_all: false
 [[TOOL_END:FILE]]
 ```
-- `old_text` — text to search for (single-line or multi-line via `|`)
-- `new_text` — replacement text (single-line or multi-line via `|`)
+- `old_text` — text to search for
+- `new_text` — replacement text
 - `replace_all` — if `true`, replaces all occurrences; if `false` (default), replaces only first
 - *Note: Multiple consecutive patches by old_text on the same file are allowed without intermediate read.*
 

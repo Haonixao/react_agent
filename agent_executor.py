@@ -78,7 +78,7 @@ async def find_input_selector(websocket):
         target.dispatchEvent(new KeyboardEvent('keydown', {
             key: 'Backspace', code: 'Backspace', bubbles: true
         }));
-        
+
         if (target.isContentEditable) {
             const range = document.createRange();
             range.selectNodeContents(target);
@@ -123,7 +123,7 @@ async def send_reply(websocket, text, selector):
     js_focus = f"""
     (function() {{
         let target = document.querySelector({json.dumps(selector)});
-        
+
         if (!target) {{
             const potentials = Array.from(document.querySelectorAll('textarea, input, [contenteditable="true"]'));
             const chatFields = potentials.filter(el => {{
@@ -201,7 +201,7 @@ def execute_file_tool(content):
     try:
         content_stripped = content.strip()
         data = {}
-        
+
         # 1. Пробуем JSON
         if content_stripped.startswith("{"):
             try:
@@ -261,16 +261,16 @@ def execute_file_tool(content):
                         if "action" not in data:
                             data["action"] = "patch"
                     else:
-                        data["old_text"] = val.strip('"\'')
+                        return "Error: incorrect patch format. Separator '|' expected"
                 elif key == "replace_all":
                     data["replace_all"] = val.lower() in ["true", "1", "yes"]
                 elif key == "new_text":
                     if val == "|":
                         in_new_text = True
-                        if "action" not in data: 
+                        if "action" not in data:
                             data["action"] = "patch"
                     else:
-                        data["new_text"] = val + "\n"
+                        return "Error: incorrect patch format. Separator '|' expected"
             if in_old_text:
                 data["old_text"] = "\n".join(old_text_lines)
             if in_new_text:
@@ -301,12 +301,12 @@ def execute_file_tool(content):
             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             text=True, encoding="utf-8"
         )
-        
+
         stdout, stderr = process.communicate(input=json.dumps(data))
         output = stdout.strip()
-        if stderr: 
+        if stderr:
             output += "\nError:\n" + stderr
-        
+
         print(f"    [+] File Tool Output: {output[:50]}...")
 
         if read_counter > 10:
@@ -328,12 +328,12 @@ async def main_loop():
 
     uri = f'ws://localhost:9222/devtools/page/{page_id}'
     last_processed_msgid = None
-    
+
     try:
         async with websockets.connect(uri) as websocket:
             print(f"--- MSGID-based Agent Executor Started (Page: {page_id}) ---")
             print("[*] Monitoring for messages and [[INPUT_AREA]] for calibration...")
-            
+
             input_selector = None
             last_processed_msgid = None
             agent_end_wait_couner = 0
@@ -351,13 +351,13 @@ async def main_loop():
                     continue
 
                 full_text = await get_page_text(websocket)
-                
+
                 # Ищем последнее сообщение агента
                 if "[[AGENT_START]]" in full_text:
                     # Извлекаем все после последнего START
                     parts = full_text.split("[[AGENT_START]]")
                     last_part = parts[-1]
-                    
+
                     # ВАЖНО: Ждем завершения сообщения (AGENT_END)
                     if "[[AGENT_END]]" not in last_part:
                         if agent_end_wait_couner > 60:
@@ -371,10 +371,10 @@ async def main_loop():
                         continue
                     else:
                         agent_end_wait_couner = 0
-                        
+
                     # Теперь у нас есть полное сообщение между START и END
                     last_msg = last_part.split("[[AGENT_END]]")[0]
-                    
+
                     # Извлекаем MSGID (более гибко)
                     msgid_match = re.search(r"MSGID:?\s*([a-zA-Z0-9_-]+)", last_msg, re.IGNORECASE)
                     if msgid_match:
@@ -407,23 +407,23 @@ async def main_loop():
                                 last_processed_msgid = current_msgid
                                 await asyncio.sleep(2)
                                 continue
-                            
+
                             # Глубокая очистка и нормализация текста
                             # 1. Удаляем невидимые Unicode-разделители
                             clean_msg = re.sub(r'[\u200b-\u200d\ufeff]', '', last_msg)
-                            
+
                             # Ищем TOOL CALLS (TERMINAL)
                             terminal_pattern = r'\[+[^\]]*TOOL_START\s*:\s*TERMINAL[^\]]*\]+(.*?)\[+[^\]]*TOOL_END\s*:\s*TERMINAL[^\]]*\]+'
                             terminal_calls = re.findall(terminal_pattern, clean_msg, re.DOTALL | re.IGNORECASE)
-                            
+
                             # Ищем TOOL CALLS (FILE)
                             file_pattern = r'\[+[^\]]*TOOL_START\s*:\s*FILE[^\]]*\]+(.*?)\[+[^\]]*TOOL_END\s*:\s*FILE[^\]]*\]+'
                             file_calls = re.findall(file_pattern, clean_msg, re.DOTALL | re.IGNORECASE)
-                            
+
                             if terminal_calls or file_calls:
                                 print(f"  > Found {len(terminal_calls)} terminal and {len(file_calls)} file tool(s).")
                                 final_reply = []
-                                
+
                                 for content in file_calls:
                                     output = execute_file_tool(content)
                                     final_reply.append(f"[[TOOL_START:FILE]]\n{output}\n[[TOOL_END:FILE]]")
@@ -453,9 +453,9 @@ async def main_loop():
                     else:
                         # Сообщение есть, но MSGID еще не написан или отсутствует
                         print("\r[*] Waiting for MSGID in last message...", end="")
-                
+
                 await asyncio.sleep(1)
-                
+
     except Exception as e:
         print(f"\nPipeline Error: {e}")
         print("Attempting to reconnect in 5 seconds...")
