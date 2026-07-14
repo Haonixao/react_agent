@@ -213,8 +213,34 @@ def execute_file_tool(content):
         if not data:
             lines = content_stripped.splitlines()
             in_new_text = False
+            in_old_text = False
             new_text_lines = []
+            old_text_lines = []
             for line in lines:
+                if in_old_text:
+                    # Многострочный old_text — до new_text или до ключа
+                    if line.strip() == "":
+                        old_text_lines.append("")
+                        continue
+                    key_match = re.match(r"^(\w+):\s*(.*)$", line)
+                    if key_match:
+                        key = key_match.group(1).lower()
+                        val = key_match.group(2).strip()
+                        if key == "new_text":
+                            # Начинается new_text
+                            in_old_text = False
+                            in_new_text = True
+                            if val == "|":
+                                continue
+                            data["new_text"] = val + "\n"
+                            continue
+                        else:
+                            # Это другой ключ — завершаем old_text
+                            in_old_text = False
+                            data["old_text"] = "\n".join(old_text_lines)
+                            # Не продолжаем — пусть текущая строка перепарсится в следующей итерации
+                    old_text_lines.append(line)
+                    continue
                 if in_new_text:
                     new_text_lines.append(line)
                     continue
@@ -228,11 +254,25 @@ def execute_file_tool(content):
                     data["path"] = val.strip('"\'')
                 elif key in ["start", "end"]:
                     data[key] = int(val)
+                elif key == "old_text":
+                    if val == "|":
+                        in_old_text = True
+                        old_text_lines = []
+                        if "action" not in data:
+                            data["action"] = "patch"
+                    else:
+                        data["old_text"] = val.strip('"\'')
+                elif key == "replace_all":
+                    data["replace_all"] = val.lower() in ["true", "1", "yes"]
                 elif key == "new_text":
-                    if val != "|":
-                        return "Error: Valid key for new_text is ` |`"
-                    in_new_text = True
-                    if "action" not in data: data["action"] = "patch"
+                    if val == "|":
+                        in_new_text = True
+                        if "action" not in data: 
+                            data["action"] = "patch"
+                    else:
+                        data["new_text"] = val + "\n"
+            if in_old_text:
+                data["old_text"] = "\n".join(old_text_lines)
             if in_new_text:
                 data["new_text"] = "\n".join(new_text_lines) + "\n"
 
@@ -242,8 +282,8 @@ def execute_file_tool(content):
         action = data.get("action")
         path = data.get("path")
 
-        # === Защита от двойного патча ===
-        if action == "patch":
+        # === Защита от двойного патча (только для start-end режима) ===
+        if action == "patch" and data.get("old_text") is None:
             if path in patched_files:
                 return f"Error: Double patch detected for {path} without read/symbols in between. This can lead to incorrect changes. Do read and then patch again"
             patched_files[path] = True

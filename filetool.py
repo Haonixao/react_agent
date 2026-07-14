@@ -144,6 +144,39 @@ def write_patch(path, start, end, new_text):
     except Exception as e:
         return f"Error patching file: {str(e)}"
 
+def write_patch_with_old(path, old_text, new_text, replace_all=False):
+    """
+    Заменяет old_text на new_text в файле.
+    Если replace_all=True — все вхождения, иначе — первое.
+    Аналог Edit с old_string + replace_all.
+    """
+    if not os.path.exists(path):
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        b_path = os.path.join(script_dir, path)
+        if not os.path.exists(b_path):
+            return f"Error: File not found: {path}"
+        path = b_path
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        if old_text not in content:
+            return "Error: old_text not found in file"
+
+        if replace_all:
+            new_content = content.replace(old_text, new_text)
+            count = content.count(old_text)
+        else:
+            new_content = content.replace(old_text, new_text, 1)
+            count = 1
+
+        with open(path, "w", encoding="utf-8", newline='') as f:
+            f.write(new_content)
+
+        return f"OK: replaced {count} occurrence(s)"
+    except Exception as e:
+        return f"Error patching file: {str(e)}"
+
 def main():
     try:
         # Read from stdin
@@ -159,7 +192,16 @@ def main():
         if action == "read":
             print(read_lines(path, int(data.get("start", 1)), int(data.get("end", 1000000))))
         elif action == "patch":
-            print(write_patch(path, int(data.get("start")), int(data.get("end")), data.get("new_text", "")))
+            old_text = data.get("old_text")
+            if old_text is not None:
+                print(write_patch_with_old(
+                    path,
+                    old_text,
+                    data.get("new_text", ""),
+                    replace_all=data.get("replace_all", False)
+                ))
+            else:
+                print(write_patch(path, int(data.get("start")), int(data.get("end")), data.get("new_text", "")))
         elif action == "symbols":
             result = get_symbols(path)
             print(result)

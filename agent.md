@@ -117,8 +117,9 @@ end: 100
 [[TOOL_END:FILE]]
 ```
 
-**For editing (patch):**
+**For editing (patch) — two modes:**
 
+**Mode 1: By line range (start-end)**
 ```
 [[TOOL_START:FILE]]
 patch: C:\full\path\to\file.py
@@ -129,6 +130,34 @@ new_text: |
     New line 2
 [[TOOL_END:FILE]]
 ```
+*Note: After patching by start-end, you must do a `read` or `symbols` before patching the same file again (protection against incorrect changes). This mode is useful when you know the exact line numbers (from read|symbols) and don't want to duplicate large amounts of code in old_text.*
+
+**Mode 2: By old_text (text search)**
+```
+[[TOOL_START:FILE]]
+patch: C:\full\path\to\file.py
+old_text: Old line 1
+new_text: New line 1
+replace_all: false
+[[TOOL_END:FILE]]
+```
+Or multi-line:
+```
+[[TOOL_START:FILE]]
+patch: C:\full\path\to\file.py
+old_text: |
+    Old line 1
+    Old line 2
+new_text: |
+    New line 1
+    New line 2
+replace_all: false
+[[TOOL_END:FILE]]
+```
+- `old_text` — text to search for (single-line or multi-line via `|`)
+- `new_text` — replacement text (single-line or multi-line via `|`)
+- `replace_all` — if `true`, replaces all occurrences; if `false` (default), replaces only first
+- *Note: Multiple consecutive patches by old_text on the same file are allowed without intermediate read.*
 
 ```
 [[TOOL_START:FILE]]
@@ -139,7 +168,9 @@ symbols: C:\full\path\to\file.py
 **How it works:**
 
 - **read** — reads lines from `start` to `end` (1-based indexing)
-- **patch** — replaces lines from `start` to `end` with new text
+- **patch** — two modes:
+  - By `start-end` — replaces lines in specified range
+  - By `old_text` — searches for exact text and replaces with `new_text`
 - **symbols** - extract code symbols (functions, classes, methods) or markdown headings with line ranges. Very useful in combination with **patch** (much better than raw `read` for understanding file structure).
 - The tool returns the result in `[[TOOL_START:FILE]] ... [[TOOL_END:FILE]]` block
 
