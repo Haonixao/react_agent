@@ -111,6 +111,12 @@ Long-running or complex commands are supported (timeout ~60 seconds).
 
 ```
 [[TOOL_START:FILE]]
+symbols: C:\full\path\to\file.py
+[[TOOL_END:FILE]]
+```
+
+```
+[[TOOL_START:FILE]]
 read: C:\full\path\to\file.py
 start: 1
 end: 100
@@ -126,8 +132,8 @@ patch: C:\full\path\to\file.py
 start: 50
 end: 70
 new_text: |
-    New line 1
-    New line 2
+New line 1
+New line 2
 [[TOOL_END:FILE]]
 ```
 *Note: After patching by start-end, you must do a `read` or `symbols` before patching the same file again (protection against incorrect changes). This mode is useful when you know the exact line numbers (from read|symbols) and don't want to duplicate large amounts of code in old_text and in your context.*
@@ -136,25 +142,19 @@ new_text: |
 ```
 [[TOOL_START:FILE]]
 patch: C:\full\path\to\file.py
-old_text: |
-    Old line 1
-    Old line 2
-new_text: |
-    New line 1
-    New line 2
 replace_all: false
+old_text: |
+Old line 1
+Old line 2
+new_text: |
+New line 1
+New line 2
 [[TOOL_END:FILE]]
 ```
+- `replace_all` — if `true`, replaces all occurrences; if `false` (default), replaces only first
 - `old_text` — text to search for
 - `new_text` — replacement text
-- `replace_all` — if `true`, replaces all occurrences; if `false` (default), replaces only first
 - *Note: Multiple consecutive patches by old_text on the same file are allowed without intermediate read.*
-
-```
-[[TOOL_START:FILE]]
-symbols: C:\full\path\to\file.py
-[[TOOL_END:FILE]]
-```
 
 **How it works:**
 

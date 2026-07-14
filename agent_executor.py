@@ -195,7 +195,7 @@ patched_files = {}  # path -> True (для защиты от двойного п
 read_counter = 0
 
 def execute_file_tool(content):
-    print(f" > Executing File Tool...")
+    print(" > Executing File Tool...")
     global read_counter
 
     try:
@@ -218,33 +218,20 @@ def execute_file_tool(content):
             old_text_lines = []
             for line in lines:
                 if in_old_text:
-                    # Многострочный old_text — до new_text или до ключа
-                    if line.strip() == "":
-                        old_text_lines.append("")
+                    # Многострочный old_text — до явного начала new_text: |
+                    if line.strip() == "new_text: |":
+                        data["old_text"] = "\n".join(old_text_lines)
+                        in_old_text = False
+                        in_new_text = True
                         continue
-                    key_match = re.match(r"^(\w+):\s*(.*)$", line)
-                    if key_match:
-                        key = key_match.group(1).lower()
-                        val = key_match.group(2).strip()
-                        if key == "new_text":
-                            # Начинается new_text
-                            in_old_text = False
-                            in_new_text = True
-                            if val == "|":
-                                continue
-                            data["new_text"] = val + "\n"
-                            continue
-                        else:
-                            # Это другой ключ — завершаем old_text
-                            in_old_text = False
-                            data["old_text"] = "\n".join(old_text_lines)
-                            # Не продолжаем — пусть текущая строка перепарсится в следующей итерации
+
                     old_text_lines.append(line)
                     continue
                 if in_new_text:
                     new_text_lines.append(line)
                     continue
-                if ":" not in line: continue
+                if ":" not in line:
+                    continue
                 key, val = line.split(":", 1)
                 key, val = key.strip().lower(), val.strip()
                 if key in ["read", "patch", "symbols"]:
@@ -254,6 +241,8 @@ def execute_file_tool(content):
                     data["path"] = val.strip('"\'')
                 elif key in ["start", "end"]:
                     data[key] = int(val)
+                elif key == "replace_all":
+                    data["replace_all"] = val.lower() in ["true", "1", "yes"]
                 elif key == "old_text":
                     if val == "|":
                         in_old_text = True
@@ -262,8 +251,6 @@ def execute_file_tool(content):
                             data["action"] = "patch"
                     else:
                         return "Error: incorrect patch format. Separator '|' expected"
-                elif key == "replace_all":
-                    data["replace_all"] = val.lower() in ["true", "1", "yes"]
                 elif key == "new_text":
                     if val == "|":
                         in_new_text = True
@@ -274,7 +261,7 @@ def execute_file_tool(content):
             if in_old_text:
                 data["old_text"] = "\n".join(old_text_lines)
             if in_new_text:
-                data["new_text"] = "\n".join(new_text_lines) + "\n"
+                data["new_text"] = "\n".join(new_text_lines)
 
         if not data:
             return "Error: Could not parse file tool parameters."
@@ -432,7 +419,8 @@ async def main_loop():
                                     cmd = cmd_raw.strip()
                                     cmd = re.sub(r'```[a-zA-Z]*\n?', '', cmd)
                                     cmd = cmd.replace('```', '').strip()
-                                    if not cmd: continue
+                                    if not cmd: 
+                                        continue
                                     output = execute_command(cmd)
                                     final_reply.append(f"[[TOOL_START:TERMINAL]]\nCommand: {cmd}\n{output}\n[[TOOL_END:TERMINAL]]")
 
