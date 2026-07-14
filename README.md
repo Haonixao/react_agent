@@ -6,7 +6,7 @@ A powerful local automation tool that turns your Web AI chat into a fully autono
 
 ## What is this?
 
-This project creates a **closed-loop ReAct agent** that runs locally on your Windows machine. It connects to Chrome via the Chrome DevTools Protocol, monitors the chat, parses your tool calls, executes them on your system, and automatically pastes the results back into the chat.
+This project creates a **closed-loop ReAct agent** that runs locally on your Windows machine. It connects to Chrome via the Chrome DevTools Protocol, monitors the chat, parses model tool calls, executes them on your system, and automatically pastes the results back into the chat.
 
 It effectively gives the AI persistent, real-world execution capabilities.
 
@@ -74,7 +74,7 @@ It effectively gives the AI persistent, real-world execution capabilities.
 
 2. **Install dependencies:**
    ```powershell
-   pip install websockets
+   pip install websockets; choco install universal-ctags -y
    ```
 
 3. **Run the agent:**
