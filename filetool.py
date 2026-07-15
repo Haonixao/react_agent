@@ -102,17 +102,17 @@ def read_lines(path, start, end):
     try:
         with open(path, "r", encoding="utf-8") as f:
             lines = f.readlines()
-        
+
         # 1-indexed slicing
         selected = lines[start-1:end]
-        
+
         # Добавляем номера строк — это критично!
         numbered = []
         for i, line in enumerate(selected, start=start):
             numbered.append(f"{i:4d} | {line.rstrip()}")
-        
+
         return "\n".join(numbered)
-        
+
     except Exception as e:
         return f"Error reading file: {str(e)}"
 
@@ -126,20 +126,20 @@ def write_patch(path, start, end, new_text):
     try:
         with open(path, "r", encoding="utf-8") as f:
             lines = f.readlines()
-        
+
         # new_text может приходить с \n или без — нормализуем
         new_lines = new_text.splitlines(keepends=True)
-        
+
         # Если new_text не заканчивается переносом, а оригинал заканчивался — добавляем
         if new_lines and not new_lines[-1].endswith('\n') and (end <= len(lines) and lines[end-1].endswith('\n') if end > 0 else False):
             new_lines[-1] += '\n'
-        
+
         # Применяем патч
         patched = lines[:start-1] + new_lines + lines[end:]
-        
+
         with open(path, "w", encoding="utf-8", newline='') as f:
             f.writelines(patched)
-        
+
         return "OK"
     except Exception as e:
         return f"Error patching file: {str(e)}"
@@ -161,7 +161,7 @@ def write_patch_with_old(path, old_text, new_text, replace_all=False):
             content = f.read()
 
         if old_text not in content:
-            return "Error: old_text not found in file"
+            return "Error: old_text not found in file. Note: old_text fully accounts for all spaces in all lines for search."
 
         if replace_all:
             new_content = content.replace(old_text, new_text)
@@ -184,11 +184,11 @@ def main():
         if not input_data:
             print("Error: No input data")
             return
-            
+
         data = json.loads(input_data)
         action = data.get("action")
         path = data.get("path")
-        
+
         if action == "read":
             print(read_lines(path, int(data.get("start", 1)), int(data.get("end", 1000000))))
         elif action == "patch":
