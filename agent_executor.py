@@ -269,6 +269,9 @@ def execute_file_tool(content):
         action = data.get("action")
         path = data.get("path")
 
+        if action == "patch" and data.get("new_text") is None:
+            return "Error: action == patch, but you did not provide new_text. you can't patch without new_text"
+
         # === Защита от двойного патча (только для start-end режима) ===
         if action == "patch" and data.get("old_text") is None:
             if path in patched_files:
