@@ -195,7 +195,7 @@ patched_files = {}  # path -> True (для защиты от двойного п
 read_counter = 0
 
 def execute_file_tool(content):
-    print(" > Executing File Tool...")
+    print("  > Executing File Tool...")
     global read_counter
 
     try:
